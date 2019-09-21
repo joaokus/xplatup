@@ -1,16 +1,23 @@
-﻿using System;
+﻿using Prism;
+using Prism.DryIoc;
+using Prism.Ioc;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+using XplatCollect.views;
 
 namespace XplatCollect
 {
-    public partial class App : Application
+    public partial class App : PrismApplication
     {
-        public App()
-        {
-            InitializeComponent();
+        public App() : this(null) { }
 
-            MainPage = new MainPage();
+        public App(IPlatformInitializer platformInitializer)
+            : base(platformInitializer)
+        {
+        }
+
+        public App(IPlatformInitializer platformInitializer, bool setFormsDependencyResolver)
+            : base(platformInitializer, true)
+        {
         }
 
         protected override void OnStart()
@@ -26,6 +33,23 @@ namespace XplatCollect
         protected override void OnResume()
         {
             // Handle when your app resumes
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterForNavigation<NavigationPage>();
+            containerRegistry.RegisterForNavigation<MainPage>();
+            containerRegistry.RegisterForNavigation<HomePage>();
+            containerRegistry.RegisterForNavigation<ProfilePage>();
+            containerRegistry.RegisterForNavigation<NewCollectionPage>();
+            containerRegistry.RegisterForNavigation<CollectionPage>();
+        }
+
+        protected override async void OnInitialized()
+        {
+            InitializeComponent();
+
+            await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(MainPage)}?selectedTab={nameof(HomePage)}");
         }
     }
 }
